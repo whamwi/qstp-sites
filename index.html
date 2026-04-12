@@ -1046,6 +1046,32 @@
                 const foundersText = await foundersResponse.text();
                 const founderRows = parseCSVProperly(foundersText);
                 
+                // Nationality normalization
+                function normalizeNationality(raw) {
+                    if (!raw) return '';
+                    const v = raw.trim();
+                    if (/^[\d\s\+\(\)\-]{6,}$/.test(v)) return '';
+                    const map = {
+                        'Syrian': 'Syria', 'Syrien': 'Syria',
+                        'Turkiye': 'Turkey',
+                        'Russian': 'Russia',
+                        'Nigerian': 'Nigeria',
+                        'Indian': 'India',
+                        'Omani': 'Oman',
+                        'Lebanese': 'Lebanon',
+                        'Libyan': 'Libya',
+                        'Egyption': 'Egypt',
+                        'Palesinian': 'Palestine',
+                        'Tunaisia': 'Tunisia',
+                        'Mexcico': 'Mexico',
+                        'Sweeden': 'Sweden',
+                        'Kurdish Iraqi': 'Kurdish Iraq',
+                        'Chinese': 'China',
+                        'Nationality': ''
+                    };
+                    return map[v] !== undefined ? map[v] : v;
+                }
+
                 // Skip header row (index 0)
                 for (let i = 1; i < founderRows.length; i++) {
                     const values = founderRows[i];
@@ -1059,7 +1085,7 @@
                             lastName: values[2] ? values[2].split(' ').slice(1).join(' ') : '',
                             email: values[3] || '',
                             phone: values[4] || '',
-                            nationality: values[5] || '',
+                            nationality: normalizeNationality(values[5]),
                             livesInQatar: values[6] || '',
                             background: values[7] || '',
                             ecUniversity: values[8] || '',
